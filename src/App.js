@@ -1,57 +1,51 @@
-import React from 'react';
-import { useEffect, useState } from 'react';
-import './App.css';
+import React from 'react'
+import { useEffect, useState } from 'react'
+import './App.css'
 
 function App() {
-  const [date, setDate] = useState(null);
+  const [host, setHost] = useState('wss://obniz.io')
+  const [data, setData] = useState('')
   useEffect(() => {
-    async function getDate() {
-      const res = await fetch('/api/date');
-      const newDate = await res.text();
-      setDate(newDate);
+    const socket = new WebSocket(host + '/obniz/7642-7710/ws/1')
+    socket.onmessage = (event) => {
+      const arr = JSON.parse(event.data)
+      for (let i = 0; i < arr.length; i++) {
+        const obj = arr[i]
+        if (obj.ws && obj.ws.redirect) {
+          socket.onmessage = null
+          socket.close()
+          setHost(obj.ws.redirect)
+        }
+        if (obj.ws && obj.ws.ready) {
+          socket.send(JSON.stringify([
+            {
+              io0: {
+                direction: "output",
+                value: true
+              },
+            },
+            {
+              ad1: {
+                stream: true
+              }
+            },
+            {
+              io2: {
+                direction: "output",
+                value: false
+              },
+            },
+          ]))
+        }
+        if(obj.ad1) {
+          setData(obj.ad1)
+        }
+      }
     }
-    getDate();
-  }, []);
+  }, [host])
   return (
-    <main>
-      <h1>Create React App + Go API</h1>
-      <h2>
-        Deployed with{' '}
-        <a
-          href="https://vercel.com/docs"
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-          Vercel
-        </a>
-        !
-      </h2>
-      <p>
-        <a
-          href="https://github.com/vercel/vercel/tree/master/examples/create-react-app"
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-          This project
-        </a>{' '}
-        was bootstrapped with{' '}
-        <a href="https://facebook.github.io/create-react-app/">
-          Create React App
-        </a>{' '}
-        and contains three directories, <code>/public</code> for static assets,{' '}
-        <code>/src</code> for components and content, and <code>/api</code>{' '}
-        which contains a serverless <a href="https://golang.org/">Go</a>{' '}
-        function. See{' '}
-        <a href="/api/date">
-          <code>api/date</code> for the Date API with Go
-        </a>
-        .
-      </p>
-      <br />
-      <h2>The date according to Go is:</h2>
-      <p>{date ? date : 'Loading date...'}</p>
-    </main>
-  );
+    <div>{data}</div>
+  )
 }
 
-export default App;
+export default App
