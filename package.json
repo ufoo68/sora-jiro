@@ -7,7 +7,9 @@
     "obniz": "^3.5.0",
     "react": "^16.6.1",
     "react-dom": "^16.6.1",
-    "react-scripts": "2.1.1"
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "2.1.1",
+    "skyway-js": "^3.0.1"
   },
   "scripts": {
     "dev": "BROWSER=none react-scripts start",
