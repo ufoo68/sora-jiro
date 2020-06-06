@@ -1,6 +1,14 @@
 import React from 'react'
 import { useEffect, useState } from 'react'
 import { SkyWay } from './SkyWay'
+import { Input, Button } from '@material-ui/core'
+import { makeStyles } from '@material-ui/core/styles'
+
+const useStyles = makeStyles({
+  root: {
+    textAlign: 'center',
+  },
+})
 
 export const WithSensor = () => {
   const [host, setHost] = useState('wss://obniz.io')
@@ -9,6 +17,8 @@ export const WithSensor = () => {
   const [sensorId, setSensorId] = useState('')
   const [connectable, setConnectable] = useState(true)
   const [called, setCalled] = useState(false)
+
+  const classes = useStyles()
 
   const connectSensor = () => {
     const socket = new WebSocket(host + `/obniz/${sensorId}/ws/1`)
@@ -57,13 +67,13 @@ export const WithSensor = () => {
     }
   }, [data])
   return (
-    <div>
+    <div className={classes.root}>
       {connectable ?
         <div>
-          <input value={sensorId} onChange={e => setSensorId(e.target.value)}></input>
-          <button onClick={connectSensor}>デバイスに接続</button>
+          <Input value={sensorId} onChange={e => setSensorId(e.target.value)}></Input>
+          <Button onClick={connectSensor}>デバイスに接続</Button>
         </div> : <></>}
-        <SkyWay galic={galic} setCalled={setCalled} />
+      <SkyWay galic={galic} setCalled={setCalled} />
     </div>
   )
 }
